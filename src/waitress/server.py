@@ -179,9 +179,8 @@ class MultiSocketServer:
         # print("Pratiksha 3... inside close")
         self.task_dispatcher.shutdown()
         wasyncore.close_all(self.map)
-        os.kill(os.getpid(), signal.SIGKILL)
         self.logger.info("Pratiksha 4... end close")
-        print("Pratiksha 4... end close")
+
 
 
 
