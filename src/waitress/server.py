@@ -16,6 +16,7 @@ import os
 import os.path
 import socket
 import time
+import signal
 
 from waitress import trigger
 from waitress.adjustments import Adjustments
@@ -169,15 +170,16 @@ class MultiSocketServer:
                 use_poll=self.adj.asyncore_use_poll,
             )
         except (SystemExit, KeyboardInterrupt):
-            self.logger.info("Pratiksha 2... SysExit exception hit")
-            print("Pratiksha 2... SysExit exception hit")
+            # self.logger.info("Pratiksha 2... SysExit exception hit")
+            # print("Pratiksha 2... SysExit exception hit")
             self.close()
 
     def close(self):
-        self.logger.info("Pratiksha 3... inside close")
-        print("Pratiksha 3... inside close")
+        # self.logger.info("Pratiksha 3... inside close")
+        # print("Pratiksha 3... inside close")
         self.task_dispatcher.shutdown()
         wasyncore.close_all(self.map)
+        os.kill(os.getpid(), signal.SIGKILL)
         self.logger.info("Pratiksha 4... end close")
         print("Pratiksha 4... end close")
 
