@@ -116,6 +116,8 @@ class ThreadedTaskDispatcher:
                 )
 
     def shutdown(self, cancel_pending=True, timeout=5):
+        self.logger.info("Pratiksha 1... inside shutdown")
+        print("Pratiksha 1... inside shutdown")
         self.set_thread_count(0)
         # Ensure the threads shut down.
         threads = self.threads
