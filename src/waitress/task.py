@@ -56,6 +56,7 @@ class ThreadedTaskDispatcher:
         self.thread_exit_cv = threading.Condition(self.lock)
 
     def start_new_thread(self, target, thread_no):
+        self.logger.info("Pratiksha task.py 0... ")
         t = threading.Thread(
             target=target, name=f"waitress-{thread_no}", args=(thread_no,)
         )
@@ -105,6 +106,7 @@ class ThreadedTaskDispatcher:
                 self.queue_cv.notify_all()
 
     def add_task(self, task):
+        self.logger.info("Pratiksha task.py 1... ")
         with self.lock:
             self.queue.append(task)
             self.queue_cv.notify()
@@ -116,24 +118,28 @@ class ThreadedTaskDispatcher:
                 )
 
     def shutdown(self, cancel_pending=True, timeout=5):
-        self.logger.info("Pratiksha 1... inside shutdown")
-        print("Pratiksha 1... inside shutdown")
+        self.logger.info("Pratiksha task.py 2... ")
         self.set_thread_count(0)
         # Ensure the threads shut down.
         threads = self.threads
         expiration = time.time() + timeout
+        self.logger.info("Pratiksha task.py 3...")
         with self.lock:
             while threads:
+                self.logger.info("Pratiksha task.py 4... ")
                 if time.time() >= expiration:
-                    self.logger.warning("%d thread(s) still running", len(threads))
+                    self.logger.info("%d thread(s) still running", len(threads))
                     break
                 self.thread_exit_cv.wait(0.1)
             if cancel_pending:
+                self.logger.info("Pratiksha task.py 5... ")
                 # Cancel remaining tasks.
                 queue = self.queue
                 if len(queue) > 0:
+                    self.logger.info("Pratiksha task.py 6... ")
                     self.logger.warning("Canceling %d pending task(s)", len(queue))
                 while queue:
+                    self.logger.info("Pratiksha task.py 7... ")
                     task = queue.popleft()
                     task.cancel()
                 self.queue_cv.notify_all()

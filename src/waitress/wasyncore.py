@@ -76,6 +76,7 @@ import time
 import warnings
 
 from . import compat, utilities
+from .utilities import logger
 
 _DISCONNECTED = frozenset({ECONNRESET, ENOTCONN, ESHUTDOWN, ECONNABORTED, EPIPE, EBADF})
 
@@ -282,7 +283,7 @@ class dispatcher:
     closing = False
     addr = None
     ignore_log_types = frozenset({"warning"})
-    logger = utilities.logger
+    logger = logger
     compact_traceback = staticmethod(compact_traceback)  # for testing
 
     def __init__(self, sock=None, map=None):
@@ -339,6 +340,7 @@ class dispatcher:
         map[self._fileno] = self
 
     def del_channel(self, map=None):
+        self.logger.info("Pratiksha wasyncore.py 12... ")
         fd = self._fileno
         if map is None:
             map = self._map
@@ -459,14 +461,17 @@ class dispatcher:
                 raise
 
     def close(self):
+        self.logger.info("Pratiksha wasyncore.py 9... ")
         self.connected = False
         self.accepting = False
         self.connecting = False
         self.del_channel()
         if self.socket is not None:
             try:
+                self.logger.info("Pratiksha wasyncore.py 10... ")
                 self.socket.close()
             except OSError as why:
+                self.logger.info("Pratiksha wasyncore.py 11... ")
                 if why.args[0] not in (ENOTCONN, EBADF):
                     raise
 
@@ -565,10 +570,13 @@ class dispatcher:
             self.handle_accepted(*pair)
 
     def handle_accepted(self, sock, addr):
+        self.logger.info("Pratiksha wasyncore.py 7... ")
         sock.close()
+        self.logger.info("Pratiksha wasyncore.py 8... ")
         self.log_info("unhandled accepted event", "warning")
 
     def handle_close(self):
+        self.logger.info("Pratiksha wasyncore.py 6... ")
         self.log_info("unhandled close event", "warning")
         self.close()
 
@@ -602,19 +610,24 @@ class dispatcher_with_send(dispatcher):
 
 
 def close_all(map=None, ignore_all=False):
+    self.logger.info("Pratiksha wasyncore.py 1... ")
     if map is None:  # pragma: no cover
         map = socket_map
     for x in list(map.values()):  # list() FBO py3
         try:
+            self.logger.info("Pratiksha wasyncore.py 2... ")
             x.close()
         except OSError as x:
+            self.logger.info("Pratiksha wasyncore.py 3... ")
             if x.args[0] == EBADF:
                 pass
             elif not ignore_all:
                 raise
         except _reraised_exceptions:
+            self.logger.info("Pratiksha wasyncore.py 4... ")
             raise
         except:
+            self.logger.info("Pratiksha wasyncore.py 5... ")
             if not ignore_all:
                 raise
     map.clear()

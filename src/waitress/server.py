@@ -27,6 +27,7 @@ from waitress.utilities import cleanup_unix_socket
 
 from . import wasyncore
 from .proxy_headers import proxy_headers_middleware
+from .utilities import logger, queue_logger
 
 
 def create_server(
@@ -138,7 +139,7 @@ def create_server(
 # SystemExit/KeyboardInterrupt so that it can attempt to cleanly shut down.
 class MultiSocketServer:
     asyncore = wasyncore  # test shim
-
+    logger = logger
     def __init__(
         self,
         map=None,
@@ -164,22 +165,23 @@ class MultiSocketServer:
 
     def run(self):
         try:
+            self.logger.info("Pratiksha server.py 0... inside run() in server.py")
             self.asyncore.loop(
                 timeout=self.adj.asyncore_loop_timeout,
                 map=self.map,
                 use_poll=self.adj.asyncore_use_poll,
             )
         except (SystemExit, KeyboardInterrupt):
-            # self.logger.info("Pratiksha 2... SysExit exception hit")
-            # print("Pratiksha 2... SysExit exception hit")
+            self.logger.info("Pratiksha server.py 1... SysExit exception hit")
             self.close()
+            self.logger.info("Pratiksha server.py 2... after close()")
 
     def close(self):
-        # self.logger.info("Pratiksha 3... inside close")
-        # print("Pratiksha 3... inside close")
+        self.logger.info("Pratiksha server.py 3... inside close")
         self.task_dispatcher.shutdown()
+        self.logger.info("Pratiksha server.py 4... after task_dispatcher.shutdown()")
         wasyncore.close_all(self.map)
-        self.logger.info("Pratiksha 4... end close")
+        self.logger.info("Pratiksha server.py 5... after wasyncore.close_all end close")
 
 
 
@@ -191,6 +193,7 @@ class BaseWSGIServer(wasyncore.dispatcher):
     socketmod = socket  # test shim
     asyncore = wasyncore  # test shim
     in_connection_overflow = False
+    logger = logger
 
     def __init__(
         self,
@@ -331,13 +334,16 @@ class BaseWSGIServer(wasyncore.dispatcher):
 
     def run(self):
         try:
+            self.logger.info("Pratiksha server.py 6... inside run() in server.py")
             self.asyncore.loop(
                 timeout=self.adj.asyncore_loop_timeout,
                 map=self._map,
                 use_poll=self.adj.asyncore_use_poll,
             )
         except (SystemExit, KeyboardInterrupt):
+            self.logger.info("Pratiksha server.py 7... ")
             self.task_dispatcher.shutdown()
+            self.logger.info("Pratiksha server.py 8... ")
 
     def pull_trigger(self):
         self.trigger.pull_trigger()
@@ -363,11 +369,13 @@ class BaseWSGIServer(wasyncore.dispatcher):
         self.log_info(format_str.format(self.effective_host, self.effective_port))
 
     def close(self):
+        self.logger.info("Pratiksha server.py 9...")
         self.trigger.close()
         return wasyncore.dispatcher.close(self)
 
 
 class TcpWSGIServer(BaseWSGIServer):
+    logger = logger
     def bind_server_socket(self):
         (_, _, _, sockaddr) = self.sockinfo
         self.bind(sockaddr)
@@ -387,6 +395,7 @@ class TcpWSGIServer(BaseWSGIServer):
 if hasattr(socket, "AF_UNIX"):
 
     class UnixWSGIServer(BaseWSGIServer):
+        logger = logger
         def __init__(
             self,
             application,
@@ -426,4 +435,5 @@ if hasattr(socket, "AF_UNIX"):
 
 
 # Compatibility alias.
+WSGIServer = TcpWSGIServer
 WSGIServer = TcpWSGIServer
