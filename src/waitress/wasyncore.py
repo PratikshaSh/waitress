@@ -610,24 +610,24 @@ class dispatcher_with_send(dispatcher):
 
 
 def close_all(map=None, ignore_all=False):
-    self.logger.info("Pratiksha wasyncore.py 1... ")
+    logger.info("Pratiksha wasyncore.py 1... ")
     if map is None:  # pragma: no cover
         map = socket_map
     for x in list(map.values()):  # list() FBO py3
         try:
-            self.logger.info("Pratiksha wasyncore.py 2... ")
+            logger.info("Pratiksha wasyncore.py 2... ")
             x.close()
         except OSError as x:
-            self.logger.info("Pratiksha wasyncore.py 3... ")
+            logger.info("Pratiksha wasyncore.py 3... ")
             if x.args[0] == EBADF:
                 pass
             elif not ignore_all:
                 raise
         except _reraised_exceptions:
-            self.logger.info("Pratiksha wasyncore.py 4... ")
+            logger.info("Pratiksha wasyncore.py 4... ")
             raise
         except:
-            self.logger.info("Pratiksha wasyncore.py 5... ")
+            logger.info("Pratiksha wasyncore.py 5... ")
             if not ignore_all:
                 raise
     map.clear()
